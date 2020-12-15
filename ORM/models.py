@@ -1,11 +1,11 @@
 import enum
 from sqlalchemy import *
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.schema import ForeignKey
 
-engine = create_engine(f'postgresql://postgres:admin@localhost:5432/postgres?', echo=True)
+engine = create_engine('postgresql://postgres:gcBwYK@localhost/lab', echo=False)
 
 SessionFactory = sessionmaker(bind=engine)
 Session = scoped_session(SessionFactory)
@@ -20,6 +20,9 @@ class UserStatus(enum.Enum):
     SignedIn = 'SignedIn'
     pending = 'pending'
 
+    def __str__(self):
+        return self.value
+
 
 class Currency(enum.Enum):
     UAH = 'UAH'
@@ -28,30 +31,40 @@ class Currency(enum.Enum):
     PLN = 'PLN'
     RUB = 'RUB'
 
+    def __str__(self):
+        return self.value
+
 
 class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     username = Column(String)
-    first_name = Column(String)
-    last_name = Column(String)
+    firstName = Column(String)
+    lastName = Column(String)
     email = Column(String)
     password = Column(Binary)
     phone = Column(String)
-    status = Column(Enum(UserStatus))
+    userAuthStatus = Column(Enum(UserStatus), default=UserStatus.pending)
+
+    def __str__(self):
+        return f'User {self.id}, {self.username} ({self.firstName} {self.lastName})' \
+               + f' {self.email} {self.phone} status: {self.userAuthStatus}'
 
 
 class Wallet(Base):
     __tablename__ = 'wallets'
 
     id = Column(Integer, primary_key=True)
-    owner_id = Column(Integer, ForeignKey(User.id))
+    user_id = Column(Integer, ForeignKey(User.id))
     name = Column(String)
-    balance = Column(Integer)
+    balance = Column(Integer, default=0)
     currency = Column(Enum(Currency))
 
     owner = relationship(User, backref='wallets', lazy='joined')
+
+    def __str__(self):
+        return f'Wallet {self.id} {self.name}, owner: {self.user_id}, balance: {self.balance} {self.currency}'
 
 
 Base.metadata.create_all(engine)
