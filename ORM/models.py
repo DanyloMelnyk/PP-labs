@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.schema import ForeignKey
 
-engine = create_engine('postgresql://postgres:gcBwYK@localhost/lab', echo=False)
+engine = create_engine('postgresql://postgres:gcBwYK@localhost/lab7', echo=False)
 
 SessionFactory = sessionmaker(bind=engine)
 Session = scoped_session(SessionFactory)
@@ -47,6 +47,12 @@ class User(Base):
     phone = Column(String)
     userAuthStatus = Column(Enum(UserStatus), default=UserStatus.pending)
 
+    children = relationship(
+        "Wallet", back_populates="owner",
+        cascade="all, delete",
+        passive_deletes=True
+    )
+
     def __str__(self):
         return f'User {self.id}, {self.username} ({self.firstName} {self.lastName})' \
                + f' {self.email} {self.phone} status: {self.userAuthStatus}'
@@ -56,12 +62,12 @@ class Wallet(Base):
     __tablename__ = 'wallets'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey(User.id))
     name = Column(String)
     balance = Column(Integer, default=0)
     currency = Column(Enum(Currency))
 
-    owner = relationship(User, backref='wallets', lazy='joined')
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
+    owner = relationship("User", back_populates="children")
 
     def __str__(self):
         return f'Wallet {self.id} {self.name}, owner: {self.user_id}, balance: {self.balance} {self.currency}'
