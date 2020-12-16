@@ -47,7 +47,7 @@ class User(Base):
     phone = Column(String)
     userAuthStatus = Column(Enum(UserStatus), default=UserStatus.pending)
 
-    children = relationship(
+    wallet = relationship(
         "Wallet", back_populates="owner",
         cascade="all, delete",
         passive_deletes=True
@@ -67,7 +67,7 @@ class Wallet(Base):
     currency = Column(Enum(Currency))
 
     user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
-    owner = relationship("User", back_populates="children")
+    owner = relationship("User", back_populates="wallet")
 
     def __str__(self):
         return f'Wallet {self.id} {self.name}, owner: {self.user_id}, balance: {self.balance} {self.currency}'
