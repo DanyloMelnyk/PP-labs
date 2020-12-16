@@ -4,29 +4,25 @@ info:
   description: Online money transfer service
   contact:
     email: anastasiia.rokytska.knm.2019@lpnu.ua
-  version: 1.0.0 
-
+  version: 1.0.0
 servers:
-  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/Nastya6/Online_wallets/1.0.0
-  - url: https://online_wallets/1.0.0
-
-tags: 
-- name: auth
-  description: authorization
-- name: users
-  description: information about users
-- name: wallets
-  description: information about user wallets
-- name: transactions
-  description: operations with transactions
-paths: 
+    url: 'http://127.0.0.1:5000/'
+tags:
+  - name: auth
+    description: authorization
+  - name: users
+    description: information about users
+  - name: wallets
+    description: information about user wallets
+  - name: transactions
+    description: operations with transactions
+paths:
   /auth:
     post:
       tags:
-      - auth
-      summary: Authentificate a user, returns a token
+        - auth
+      summary: 'Authentificate a user, returns a token'
       operationId: getAuthToken
       requestBody:
         description: Credentials
@@ -36,39 +32,38 @@ paths:
               $ref: '#/components/schemas/Credentials'
         required: true
       responses:
-        200:
+        '200':
           description: Access token
           headers:
             AccessToken:
               $ref: '#/components/headers/AccessToken'
-        404:
+        '404':
           description: Invalid email/password
-      
   /user:
     get:
-      tags: 
-       - users
+      tags:
+        - users
       summary: Return a list of users
       operationId: getListOfUsers
       parameters:
-      - name: email
-        in: query
-        description: "Email to filter by"
-        schema:
-          type: string
-      - name: first_name
-        in: query
-        description: "First name to filter by"
-        schema:
-          type: string
-      - name: last_name
-        in: query
-        description: "Last name to filter by"
-        schema:
-          type: string
+        - name: email
+          in: query
+          description: Email to filter by
+          schema:
+            type: string
+        - name: firstName
+          in: query
+          description: First name to filter by
+          schema:
+            type: string
+        - name: lastName
+          in: query
+          description: Last name to filter by
+          schema:
+            type: string
       security: []
       responses:
-        200:
+        '200':
           description: list of users
           content:
             application/json:
@@ -77,8 +72,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/UserData'
     post:
-      tags: 
-       - users
+      tags:
+        - users
       summary: Create a new user
       operationId: CreateUser
       requestBody:
@@ -90,56 +85,50 @@ paths:
         required: true
       security: []
       responses:
-        200:
+        '200':
           description: Created user
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserData'
-        400:
+        '400':
           description: Invalid input
-  /user/{user_id}:
+  '/user/{user_id}':
     get:
-      tags: 
-       - users
+      tags:
+        - users
       summary: Return a user by id
       operationId: GetUser
       parameters:
-      # - name: id
-      #   in: query
-      #   description: "Enter id to find a user"
-      #   schema:
-      #     type: string
-      - name: user_id
-        in: path
-        description: "id of user"
-        schema:
-          type: integer
-          format: int64
-        required: true
-
+        - name: user_id
+          in: path
+          description: id of user
+          schema:
+            type: integer
+            format: int64
+          required: true
       responses:
-        200:
+        '200':
           description: Access geting user
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserData'
-        404:
+        '404':
           description: Invalid id
     put:
-      tags: 
-       - users
+      tags:
+        - users
       summary: Update info about user
       operationId: UpdateUser
       parameters:
-      - name: user_id
-        in: path
-        description: "Enter id"
-        schema:
-          type: integer
-          format: int64
-        required: true 
+        - name: user_id
+          in: path
+          description: Enter id
+          schema:
+            type: integer
+            format: int64
+          required: true
       requestBody:
         description: Change info about user
         content:
@@ -148,46 +137,46 @@ paths:
               $ref: '#/components/schemas/UserData'
         required: true
       responses:
-        200:
+        '200':
           description: Access updating user info
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserData'
-        404:
+        '404':
           description: Invalid id
     delete:
-      tags: 
-       - users
+      tags:
+        - users
       summary: Delete a user
       operationId: DeleteUser
       parameters:
-      - name: user_id
-        in: path
-        description: "Enter id"
-        schema:
-          type: string
-        required: true 
+        - name: user_id
+          in: path
+          description: Enter id
+          schema:
+            type: string
+          required: true
       responses:
-        200:
+        '200':
           description: Successful removal
-        404:
+        '404':
           description: Invalid id
   /wallet:
     get:
-      tags: 
-       - wallets
+      tags:
+        - wallets
       summary: Return a list of wallets of authorized user
       operationId: getListOfWallets
       parameters:
-      - name: user_id
-        in: query
-        description: "Enter id of user to show wallets"
-        schema:
-          type: integer
-          format: int64
+        - name: user_id
+          in: query
+          description: Enter id of user to show wallets
+          schema:
+            type: integer
+            format: int64
       responses:
-        200:
+        '200':
           description: list of user wallets
           content:
             application/json:
@@ -195,11 +184,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletData'
-        404:
+        '404':
           description: Invalid id
     post:
-      tags: 
-       - wallets
+      tags:
+        - wallets
       summary: Create a new wallet for authorized user
       operationId: createWallet
       requestBody:
@@ -210,61 +199,48 @@ paths:
               $ref: '#/components/schemas/WalletToCreate'
         required: true
       responses:
-        200:
+        '200':
           description: Created user wallet
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletData'
-        400:
+        '400':
           description: Invalid input
-          
-    
-          
-  /wallet/{wallet_name}:
+  '/wallet/{wallet_name}':
     get:
-      tags: 
-       - wallets
+      tags:
+        - wallets
       summary: Return a user wallet by wallet name
       operationId: GetWallet
       parameters:
-      # - name: name
-      #   in: query
-      #   description: "Enter wallet name to find one"
-      #   schema:
-      #     type: string
-      - name: wallet_name
-        in: path
-        description: "name of wallet"
-        schema:
-          type: string
-        required: true
+        - name: wallet_name
+          in: path
+          description: name of wallet
+          schema:
+            type: string
+          required: true
       responses:
-        200:
+        '200':
           description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletData'
-        404:
+        '404':
           description: Invalid wallet name
     put:
-      tags: 
-       - wallets
+      tags:
+        - wallets
       summary: Update info about user wallet
       operationId: UpdateWallet
       parameters:
-      # - name: name
-      #   in: query
-      #   description: "Enter wallet name to find one"
-      #   schema:
-      #     type: string
-      - name: wallet_name
-        in: path
-        description: "name of wallet"
-        schema:
-          type: string
-        required: true
+        - name: wallet_name
+          in: path
+          description: name of wallet
+          schema:
+            type: string
+          required: true
       requestBody:
         description: Change info about user wallet
         content:
@@ -273,90 +249,66 @@ paths:
               $ref: '#/components/schemas/WalletData'
         required: true
       responses:
-        200:
+        '200':
           description: Access updating user wallet info
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletData'
-        404:
+        '404':
           description: Invalid wallet name
     delete:
-      tags: 
-       - wallets
+      tags:
+        - wallets
       summary: Delete a user wallet
       operationId: DeleteWallet
       parameters:
-      - name: wallet_name
-        in: path
-        description: "Enter wallet name"
-        schema:
-          type: string
-        required: true 
+        - name: wallet_name
+          in: path
+          description: Enter wallet name
+          schema:
+            type: string
+          required: true
       responses:
-        200:
+        '200':
           description: Successful removal
-        404:
+        '404':
           description: Invalid wallet name
-  /wallet/{wallet_name}/send_money:
+  '/wallet/{wallet_name}/send_money':
     post:
-      tags: 
-       - transactions
+      tags:
+        - transactions
       summary: Send money from one wallet of the authorized user to another wallet of any user
       operationId: SendMoney
       parameters:
-      - name: wallet_name
-        in: path
-        description: "name of wallet from wich you want to send money"
-        schema:
-          type: string
-        required: true
-      - name: wallet_recipient
-        in: query
-        description: "name of wallet, wich will receive the money "
-        schema:
-          type: string
-        required: true
-      - name: cost
-        in: query
-        description: "how much money you want to send"
-        schema:
-          type: integer
-          format: int64
-        required: true
+        - name: wallet_name
+          in: path
+          description: name of wallet from wich you want to send money
+          schema:
+            type: string
+          required: true
+        - name: wallet_recipient
+          in: query
+          description: 'name of wallet, wich will receive the money '
+          schema:
+            type: string
+          required: true
+        - name: cost
+          in: query
+          description: how much money you want to send
+          schema:
+            type: integer
+            format: int64
+          required: true
       responses:
-        200:
+        '200':
           description: Successful transaction
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletData'
-        404:
+        '404':
           description: Invalid wallet name
-  /wallet/{wallet_name}/transactions:   
-    get: 
-      tags: 
-       - transactions
-      summary: Get transactions associated with a wallet of the authorised user
-      operationId: GetMoney
-      parameters:
-      - name: wallet_name
-        in: path
-        description: "name of wallet which received the money"
-        schema:
-          type: string
-        required: true
-      responses:
-        200:
-          description: Successful transaction
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletData'
-        404:
-          description: Invalid wallet name
-    
-      
 components:
   schemas:
     Credentials:
@@ -366,7 +318,6 @@ components:
           type: string
         password:
           type: string
-          
     UserToCreate:
       type: object
       properties:
@@ -379,7 +330,6 @@ components:
       required:
         - username
         - password
-        
     WalletToCreate:
       type: object
       properties:
@@ -396,10 +346,8 @@ components:
         user_id:
           type: integer
           format: int64
-       
       required:
         - name
-      
     WalletData:
       type: object
       properties:
@@ -419,12 +367,10 @@ components:
             - PLN
             - EUR
             - RUB
-       
       required:
         - user_id
         - balance
         - name
-        
     UserData:
       type: object
       properties:
@@ -450,21 +396,20 @@ components:
             - SignedIn
             - pending
       xml:
-        name: User  
+        name: User
   headers:
-   AccessToken:
+    AccessToken:
       schema:
         type: string
-        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
   securitySchemes:
-    bearerAuth:           
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT    
+      bearerFormat: JWT
     api_key:
       type: apiKey
       name: api_key
       in: header
-
 security:
   - bearerAuth: []

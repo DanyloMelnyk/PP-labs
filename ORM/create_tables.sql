@@ -1,22 +1,21 @@
-create table users(
-    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-    username VARCHAR UNIQUE  NOT NULL,
-    password bytea,
-
-    first_name VARCHAR,
-    last_name VARCHAR,
-    email VARCHAR UNIQUE,
-    phone VARCHAR UNIQUE,
-    status VARCHAR
+CREATE TABLE users (
+    id SERIAL NOT NULL,
+    username VARCHAR,
+    "firstName" VARCHAR,
+    "lastName" VARCHAR,
+    email VARCHAR,
+    password BYTEA,
+    phone VARCHAR,
+    "userAuthStatus" userstatus,
+    PRIMARY KEY (id)
 );
 
-create table wallets(
-    id SERIAL PRIMARY KEY,
-    owner_id INTEGER,
-
+CREATE TABLE wallets (
+    id SERIAL NOT NULL,
     name VARCHAR,
     balance INTEGER,
-    currency VARCHAR,
-
-    FOREIGN KEY (owner_id) REFERENCES users (id)
+    currency currency,
+    user_id INTEGER,
+    PRIMARY KEY (id),
+    FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
 );
