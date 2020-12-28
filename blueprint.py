@@ -17,7 +17,7 @@ def auth():
 
 @blueprint.route('/user', methods=['GET'])
 def list_users():
-    user_filter = UserListFilter().load(request.args)
+    user_filter = UserListFilter().load(request.json)
 
     return jsonify(db.list_users(user_filter))
 
@@ -44,12 +44,12 @@ def update_user(user_id):
 @blueprint.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     db.delete(User, user_id)
-    return '', 200
+    return 'Deleting is successful', 200
 
 
 @blueprint.route('/wallet', methods=['GET'])
 def list_wallets():
-    wallets_filter = WalletListFilter().load(request.args)
+    wallets_filter = WalletListFilter().load(request.json)
 
     return jsonify(db.list_wallets(wallets_filter))
 
@@ -75,10 +75,10 @@ def update_wallet(wallet_name):
 @blueprint.route('/wallet/<string:wallet_name>', methods=['DELETE'])
 def delete_wallet(wallet_name):
     db.delete_wallet(wallet_name)
-    return '', 200
+    return 'Wallet is deleted', 200
 
 
 @blueprint.route('/wallet/<string:wallet_name>/send_money', methods=['POST'])
 def send_money(wallet_name):
-    transaction = Transaction().load(request.args)
+    transaction = Transaction().load(request.json)
     return db.send_money(wallet_name, transaction)

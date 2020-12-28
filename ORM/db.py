@@ -1,10 +1,22 @@
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 from marshmallow import ValidationError
 from sqlalchemy.orm.exc import NoResultFound
-
+# import bcrypt
 from ORM.models import Session, User, Wallet
 from shemas import UserData, WalletData
 from utils import convert_currency
+from flask_httpauth import HTTPBasicAuth
+
+auth = HTTPBasicAuth()
+
+
+@auth.verify_password
+def verify_password(username, password):
+    session = Session()
+    found_user = session.query(User).filter_by(username=username).one_or_none()
+
+    if found_user is not None and check_password_hash(found_user.password, password):
+        return found_user
 
 
 def list_users(users_filter):
@@ -20,7 +32,7 @@ def list_users(users_filter):
     if users_filter.get('lastName'):
         query = query.filter_by(lastName=users_filter.get('lastName'))
 
-    return UserData(many=True).dump(query.all())
+    return UserData(many=True,exclude=['password', 'phone', 'id']).dump(query.all())
 
 
 def create_user(user_to_create):
@@ -39,20 +51,26 @@ def create_user(user_to_create):
     else:
         raise ValidationError("Email must be unique")
 
-
+@auth.login_required
 def get_user(user_id):
     session = Session()
     try:
         user = session.query(User).filter_by(id=user_id).one()
     except NoResultFound:
         raise NoResultFound('Invalid id')
+    # if user is None:
+    #     raise NoResultFound('User is not found')
+    if user.id != auth.current_user().id:
+        raise NoResultFound('You don\'t have required permission')
+    # exclude = ['password']
+    return UserData(exclude=['password']).dump(user)
 
-    return UserData().dump(user)
 
-
+@auth.login_required
 def update_user(user_id, user_data):
     session = Session()
-
+    if auth.current_user().id != user_id:
+        raise NoResultFound('You don\'t have required permission')
     try:
         user = session.query(User).filter_by(id=user_id).one()
     except NoResultFound:
@@ -77,10 +95,13 @@ def update_user(user_id, user_data):
 
     session.commit()
 
-    return UserData().dump(user)
+    return UserData(exclude=['password']).dump(user)
 
 
+@auth.login_required
 def delete(model, id):
+    if auth.current_user().id != id:
+        raise NoResultFound('You don\'t have required permission')
     session = Session()
     try:
         session.query(model).filter_by(id=id).one()
@@ -91,24 +112,31 @@ def delete(model, id):
     session.commit()
 
 
+@auth.login_required
 def list_wallets(wallets_filter):
     session = Session()
+    if auth.current_user().id != wallets_filter.get('user_id'):
+        raise NoResultFound('You don\'t have required permission')
+
     query = session.query(Wallet)
 
-    if wallets_filter.get('user_id'):
-        try:
-            session.query(User).filter_by(id=wallets_filter.get('user_id')).one()
-        except NoResultFound:
-            raise NoResultFound('Invalid id')
+    try:
+        session.query(User).filter_by(id=wallets_filter.get('user_id')).one()
+    except NoResultFound:
+        raise NoResultFound('Invalid id')
 
-        query = query.filter_by(user_id=wallets_filter.get('user_id'))
+    query = query.filter_by(user_id=wallets_filter.get('user_id'))
 
     return WalletData(many=True).dump(query.all())
 
 
+@auth.login_required
 def create_wallet(wallet_to_create):
-    session = Session()
 
+    if auth.current_user().id != wallet_to_create.get('user_id'):
+        raise NoResultFound('You don\'t have required permission')
+
+    session = Session()
     try:
         session.query(Wallet).filter_by(name=wallet_to_create.get('name')).one()
     except NoResultFound:
@@ -123,27 +151,34 @@ def create_wallet(wallet_to_create):
         raise ValidationError("Wallet name must be unique")
 
 
+@auth.login_required
 def get_wallet(wallet_name):
     session = Session()
     try:
         wallet = session.query(Wallet).filter_by(name=wallet_name).one()
     except NoResultFound:
         raise NoResultFound('Invalid wallet name')
-
+    if wallet.user_id != auth.current_user().id:
+        raise NoResultFound('You don\'t have required permission')
     return WalletData().dump(wallet)
 
 
+@auth.login_required
 def delete_wallet(wallet_name):
     session = Session()
     try:
-        session.query(Wallet).filter_by(name=wallet_name).one()
+        wallet = session.query(Wallet).filter_by(name=wallet_name).one()
     except NoResultFound:
         raise NoResultFound('Invalid wallet name')
+
+    if wallet.user_id != auth.current_user().id:
+        raise NoResultFound('You don\'t have required permission')
 
     session.query(Wallet).filter_by(name=wallet_name).delete()
     session.commit()
 
 
+@auth.login_required
 def update_wallet(wallet_name, wallet_data):
     session = Session()
 
@@ -151,6 +186,9 @@ def update_wallet(wallet_name, wallet_data):
         wallet = session.query(Wallet).filter_by(name=wallet_name).one()
     except NoResultFound:
         raise NoResultFound('Invalid wallet name')
+
+    if wallet.user_id != auth.current_user().id:
+        raise NoResultFound('You don\'t have required permission')
 
     if wallet_data.get('name') and wallet_data.get('name') != wallet_name:
         try:
@@ -171,11 +209,15 @@ def update_wallet(wallet_name, wallet_data):
     return WalletData().dump(wallet)
 
 
+@auth.login_required
 def send_money(wallet_name, transaction):
     session = Session()
 
     try:
         sender = session.query(Wallet).filter_by(name=wallet_name).one()
+        if sender.user_id != auth.current_user().id:
+            raise NoResultFound('You don\'t have required permission')
+
         recipient = session.query(Wallet).filter_by(name=transaction.get('wallet_recipient')).one()
     except NoResultFound:
         raise NoResultFound('Invalid wallet name')
