@@ -5,32 +5,32 @@ session = Session()
 user = User(
     id=1,
     username='terminator2000',
-    first_name='admin',
-    last_name='admin',
+    firstName='admin',
+    lastName='admin',
     email='example@gmail.com',
     phone='+38099',
-    status=UserStatus.notSignedIn,
+    userAuthStatus=UserStatus.notSignedIn,
 )
 
 user2 = User(
     id=2,
     username='terminator2002',
-    first_name='admin',
-    last_name='admin',
+    firstName='admin',
+    lastName='admin',
     email='example1@gmail.com',
     phone='+380990',
-    status=UserStatus.notSignedIn,
+    userAuthStatus=UserStatus.notSignedIn,
 )
 
 
 user3 = User(
     id=3,
     username='terminator2003',
-    first_name='admin',
-    last_name='admin',
+    firstName='admin',
+    lastName='admin',
     email='example2@gmail.com',
     phone='+380940',
-    status=UserStatus.notSignedIn,
+    userAuthStatus=UserStatus.notSignedIn,
 )
 
 wallet13 = Wallet(
