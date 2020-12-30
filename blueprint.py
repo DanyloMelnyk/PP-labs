@@ -9,23 +9,15 @@ from shemas import Credentials, UserListFilter, UserData, UserToCreate, WalletLi
 blueprint = Blueprint('api', __name__)
 
 
-@blueprint.route('/auth', methods=['POST'])
-def auth():
-    credo = Credentials().load(request.json)
-    raise NoResultFound('Invalid email/password')
-
-
 @blueprint.route('/user', methods=['GET'])
 def list_users():
     user_filter = UserListFilter().load(request.json)
-
     return jsonify(db.list_users(user_filter))
 
 
 @blueprint.route('/user', methods=['POST'])
 def create_user():
     user_to_create = UserToCreate().load(request.json)
-
     return jsonify(db.create_user(user_to_create))
 
 
