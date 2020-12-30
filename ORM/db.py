@@ -32,7 +32,7 @@ def list_users(users_filter):
     if users_filter.get('lastName'):
         query = query.filter_by(lastName=users_filter.get('lastName'))
 
-    return UserData(many=True,exclude=['password', 'phone', 'id']).dump(query.all())
+    return UserData(many=True, exclude=['password', 'phone', 'id']).dump(query.all())
 
 
 def create_user(user_to_create):
@@ -51,9 +51,11 @@ def create_user(user_to_create):
     else:
         raise ValidationError("Email must be unique")
 
+
 @auth.login_required
 def get_user(user_id):
     session = Session()
+
     try:
         user = session.query(User).filter_by(id=user_id).one()
     except NoResultFound:

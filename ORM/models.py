@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm.scoping import scoped_session
 from sqlalchemy.schema import ForeignKey
 
-engine = create_engine('postgres://postgres:nastya@localhost:5432/postgres', echo=False)
+engine = create_engine('postgresql://postgres:admin@localhost:5432/postgres', echo=False)
 
 SessionFactory = sessionmaker(bind=engine)
 Session = scoped_session(SessionFactory)

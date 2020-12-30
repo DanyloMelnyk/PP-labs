@@ -1,80 +1,80 @@
-from models import Session, User, Wallet, Currency, UserStatus
-
-session = Session()
-
-user = User(
-    id=1,
-    username='terminator2000',
-    firstName='admin',
-    lastName='admin',
-    email='example@gmail.com',
-    phone='+38099',
-    userAuthStatus=UserStatus.notSignedIn,
-)
-
-user2 = User(
-    id=2,
-    username='terminator2002',
-    firstName='admin',
-    lastName='admin',
-    email='example1@gmail.com',
-    phone='+380990',
-    userAuthStatus=UserStatus.notSignedIn,
-)
+from ORM.models import Session, User, Wallet, Currency, UserStatus
+from flask_bcrypt import generate_password_hash
 
 
-user3 = User(
-    id=3,
-    username='terminator2003',
-    firstName='admin',
-    lastName='admin',
-    email='example2@gmail.com',
-    phone='+380940',
-    userAuthStatus=UserStatus.notSignedIn,
-)
+def create_objects():
+    session = Session()
 
-wallet13 = Wallet(
-    id=3,
-    name='MyFirstWallet',
-    balance=10000,
-    currency=Currency.USD,
-    owner=user3,
-)
+    user = User(
+        username='terminator2000',
+        firstName='admin',
+        lastName='admin',
+        email='example@gmail.com',
+        phone='+38099',
+        userAuthStatus=UserStatus.notSignedIn,
+        password=generate_password_hash('admin')
+    )
 
-wallet23 = Wallet(
-    id=4,
-    name='MySecondWallet',
-    balance=100,
-    currency=Currency.UAH,
-    owner=user3,
-)
+    user2 = User(
+        username='terminator2002',
+        firstName='admin',
+        lastName='admin',
+        email='example1@gmail.com',
+        phone='+380990',
+        userAuthStatus=UserStatus.notSignedIn,
+        password=generate_password_hash('admin')
+    )
 
-wallet1 = Wallet(
-    id=1,
-    name='MyFirstWallet',
-    balance=10000,
-    currency=Currency.USD,
-    owner=user,
-)
+    user3 = User(
+        username='terminator2003',
+        firstName='admin',
+        lastName='admin',
+        email='example2@gmail.com',
+        phone='+380940',
+        userAuthStatus=UserStatus.notSignedIn,
+        password=generate_password_hash('admin')
+    )
 
-wallet2 = Wallet(
-    id=2,
-    name='MySecondWallet',
-    balance=100,
-    currency=Currency.UAH,
-    owner=user,
-)
+    wallet13 = Wallet(
+        name='MyFirstWallet',
+        balance=10000,
+        currency=Currency.USD,
+        owner=user3,
+    )
 
-session.add(user)
-session.add(user2)
-session.add(wallet1)
-session.add(wallet2)
+    wallet23 = Wallet(
+        name='MySecondWallet',
+        balance=100,
+        currency=Currency.UAH,
+        owner=user3,
+    )
 
-session.add(user3)
-session.add(wallet13)
-session.add(wallet23)
+    wallet1 = Wallet(
+        name='MyWallet',
+        balance=10000,
+        currency=Currency.USD,
+        owner=user,
+    )
 
-session.commit()
+    wallet2 = Wallet(
+        name='MySecoWallet',
+        balance=100,
+        currency=Currency.UAH,
+        owner=user,
+    )
 
+    session.add(user)
+    session.add(user2)
+    session.add(wallet1)
+    session.add(wallet2)
+
+    session.add(user3)
+    session.add(wallet13)
+    session.add(wallet23)
+
+    session.commit()
+
+
+create_objects()
 
 # psql -h localhost -d postgres -U postgres -p 5432 -a -q -f ORM/create_tables.sql
